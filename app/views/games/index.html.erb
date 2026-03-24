@@ -1,0 +1,158 @@
+<div id="arena-app">
+  <canvas id="particle-canvas"></canvas>
+
+  <!-- ==================== INTRO ==================== -->
+  <div id="intro-screen" class="screen active">
+    <div class="intro-bg-grid"></div>
+    <div class="intro-content">
+      <div class="game-logo">
+        <span class="logo-a">A</span><span class="logo-r">R</span><span class="logo-e">E</span><span class="logo-n">N</span><span class="logo-aa">A</span>
+        <div class="logo-subtitle">EPIC BATTLE ARENA</div>
+      </div>
+      <div class="intro-tagline">Choose your warrior. Claim the throne.</div>
+      <div class="mode-selector">
+        <button class="mode-btn active" id="btn-manual"><span class="mode-icon">⚔️</span><span>Player vs AI</span></button>
+        <button class="mode-btn" id="btn-auto"><span class="mode-icon">🤖</span><span>AI vs AI</span></button>
+      </div>
+      <div class="pick-label">SELECT YOUR CHAMPION</div>
+      <div class="avatar-grid" id="avatar-picker">
+        <% Game::AVATARS.each do |name, data| %>
+        <div class="avatar-card" data-avatar="<%= name %>" style="--char-color:<%= data[:color] %>;--char-glow:<%= data[:glow] %>">
+          <div class="avatar-portrait" id="portrait-<%= name %>">
+            <div class="avatar-portrait-glow"></div>
+          </div>
+          <div class="avatar-info">
+            <div class="avatar-name"><%= name %></div>
+            <div class="avatar-title"><%= data[:title] %></div>
+            <div class="avatar-element" style="color:<%= data[:color] %>"><%= data[:element] %></div>
+            <div class="avatar-stats"><span>HP <%= data[:hp] %></span><span>ATK <%= data[:attack] %></span><span>SPD <%= data[:speed] %></span></div>
+          </div>
+          <div class="avatar-selected-badge">SELECTED</div>
+        </div>
+        <% end %>
+      </div>
+      <div class="opponent-section" id="opponent-section">
+        <div class="opp-label">OPPONENT</div>
+        <div class="opponent-chips" id="opponent-picker">
+          <% Game::AVATARS.keys.each do |name| %>
+          <div class="opp-chip" data-opp="<%= name %>"><%= name %></div>
+          <% end %>
+        </div>
+      </div>
+      <button class="start-btn" id="start-btn"><span>ENTER THE ARENA</span><div class="start-btn-glow"></div></button>
+    </div>
+  </div>
+
+  <!-- ==================== BATTLE ==================== -->
+  <div id="battle-screen" class="screen">
+    <canvas id="battle-canvas"></canvas>
+
+    <!-- Top bar -->
+    <div class="battle-topbar">
+      <div class="round-info"><span class="round-label">ROUND</span><span class="round-num" id="round-num">1</span></div>
+      <label class="toggle-switch"><input type="checkbox" id="mode-toggle"><span class="toggle-slider"><span class="toggle-label-left">MANUAL</span><span class="toggle-label-right">AUTO</span></span></label>
+      <button class="quit-btn" id="quit-btn">✕ QUIT</button>
+    </div>
+
+    <!-- Stats rows -->
+    <div class="stats-row">
+      <div class="stats-side left">
+        <span class="fighter-name-top" id="p1-name">RICHARDSON</span>
+        <div class="hp-bar-wrap"><div class="bar-label">HP</div><div class="hp-bar-track"><div class="hp-bar-fill" id="hp-bar-p1" style="width:100%"></div></div><div class="hp-text" id="hp-text-p1">140</div></div>
+        <div class="mp-bar-wrap"><div class="bar-label">MP</div><div class="mp-bar-track"><div class="mp-bar-fill" id="mp-bar-p1" style="width:100%"></div></div><div class="mp-text" id="mp-text-p1">70</div></div>
+        <div class="status-icons" id="status-p1"></div>
+      </div>
+      <div style="flex:0 0 auto;text-align:center;padding:0 8px">
+        <div class="score-val" id="score-p1" style="color:var(--gold);font-family:var(--font-title);font-size:20px">0</div>
+        <div style="font-family:var(--font-ui);font-size:8px;color:var(--text-dim);letter-spacing:2px">vs</div>
+        <div class="score-val" id="score-p2" style="color:var(--gold);font-family:var(--font-title);font-size:20px">0</div>
+      </div>
+      <div class="stats-side right">
+        <span class="fighter-name-top" id="p2-name">MAYA</span>
+        <div class="hp-bar-wrap"><div class="bar-label">HP</div><div class="hp-bar-track"><div class="hp-bar-fill p2" id="hp-bar-p2" style="width:100%"></div></div><div class="hp-text" id="hp-text-p2">105</div></div>
+        <div class="mp-bar-wrap"><div class="bar-label">MP</div><div class="mp-bar-track"><div class="mp-bar-fill" id="mp-bar-p2" style="width:100%"></div></div><div class="mp-text" id="mp-text-p2">120</div></div>
+        <div class="status-icons" id="status-p2"></div>
+      </div>
+    </div>
+
+    <!-- Arena -->
+    <div class="arena-center" id="arena-center">
+      <div class="arena-bg"></div>
+      <div class="arena-floor"></div>
+      <div class="arena-lights"></div>
+
+      <!-- P1 fighter -->
+      <div class="fighter-wrap p1" id="wrap-p1">
+        <div class="fighter-sprite idle" id="sprite-p1"><svg id="char-svg-p1" viewBox="0 0 120 200" xmlns="http://www.w3.org/2000/svg"></svg></div>
+        <div class="fighter-shadow-ground"></div>
+        <div class="score-badge"><span class="score-label">WINS</span></div>
+      </div>
+
+      <!-- HUD center -->
+      <div class="battle-hud">
+        <div class="vs-badge">VS</div>
+        <div class="battle-log" id="battle-log"><div class="log-entry intro-entry">The battle begins!</div></div>
+        <div class="turn-indicator" id="turn-indicator">
+          <div class="turn-arrow left-arrow"></div>
+          <span class="turn-text" id="turn-text">Player 1's Turn</span>
+          <div class="turn-arrow right-arrow"></div>
+        </div>
+      </div>
+
+      <!-- P2 fighter -->
+      <div class="fighter-wrap p2" id="wrap-p2">
+        <div class="fighter-sprite idle" id="sprite-p2"><svg id="char-svg-p2" viewBox="0 0 120 200" xmlns="http://www.w3.org/2000/svg"></svg></div>
+        <div class="fighter-shadow-ground"></div>
+        <div class="score-badge"><span class="score-label">WINS</span></div>
+      </div>
+    </div>
+
+    <!-- Moves -->
+    <div class="moves-panel" id="moves-panel">
+      <div class="moves-title">SELECT YOUR MOVE</div>
+      <div class="moves-grid" id="moves-grid"></div>
+    </div>
+
+    <!-- Difficulty -->
+    <div class="difficulty-bar">
+      <span class="diff-label">AI:</span>
+      <button class="diff-btn" data-diff="0">Easy</button>
+      <button class="diff-btn active" data-diff="1">Normal</button>
+      <button class="diff-btn" data-diff="2">Hard</button>
+      <button class="diff-btn" data-diff="3">Brutal</button>
+    </div>
+  </div>
+
+  <!-- ==================== RESULT ==================== -->
+  <div id="result-screen" class="screen">
+    <div class="result-bg"></div>
+    <canvas id="confetti-canvas"></canvas>
+    <div class="result-content">
+      <div class="result-badge" id="result-badge"></div>
+      <div class="result-title" id="result-title">VICTORY!</div>
+      <div class="result-winner-name" id="result-winner-name"></div>
+      <div class="result-winner-svg" id="result-winner-svg"></div>
+      <div class="result-stats" id="result-stats"></div>
+      <div class="result-buttons">
+        <button class="result-btn primary" id="btn-rematch">REMATCH</button>
+        <button class="result-btn secondary" id="btn-menu">MAIN MENU</button>
+      </div>
+    </div>
+    <div class="leaderboard-panel"><div class="lb-title">LEADERBOARD</div><div class="lb-list" id="lb-list"></div></div>
+  </div>
+
+  <!-- FX -->
+  <div id="fx-overlay"><div class="fx-hit" id="fx-hit"></div><div class="fx-text" id="fx-text"></div></div>
+
+  <!-- BLOCK reaction button -->
+  <div id="block-btn-wrap" class="hidden">
+    <div class="block-prompt">INCOMING ATTACK — REACT!</div>
+    <button id="block-btn">🛡️ BLOCK</button>
+    <div class="block-timer-bar"><div id="block-timer-fill" class="block-timer-fill"></div></div>
+  </div>
+</div>
+
+<script>
+window.AVATARS = <%= Game::AVATARS.to_json.html_safe %>;
+window.CSRF_TOKEN = "<%= form_authenticity_token %>";
+</script>
