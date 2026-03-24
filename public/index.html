@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>ARENA — Epic Battle Game</title>
+  <meta name="theme-color" content="#0a0a1a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" href="/assets/application-e716d52cba92f6ac66bf16ff82a79cb6fc619c5721393955531d8339b4458712.css" media="all">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<div id="arena-app">
+  <canvas id="particle-canvas"></canvas>
+
+  <!-- ==================== INTRO ==================== -->
+  <div id="intro-screen" class="screen active">
+    <div class="intro-bg-grid"></div>
+    <div class="intro-content">
+      <div class="game-logo">
+        <span class="logo-a">A</span><span class="logo-r">R</span><span class="logo-e">E</span><span class="logo-n">N</span><span class="logo-aa">A</span>
+        <div class="logo-subtitle">EPIC BATTLE ARENA</div>
+      </div>
+      <div class="intro-tagline">Choose your warrior. Claim the throne.</div>
+      <div class="mode-selector">
+        <button class="mode-btn active" id="btn-manual"><span class="mode-icon">⚔️</span><span>Player vs AI</span></button>
+        <button class="mode-btn" id="btn-auto"><span class="mode-icon">🤖</span><span>AI vs AI</span></button>
+      </div>
+      <div class="pick-label">SELECT YOUR CHAMPION</div>
+      <div class="avatar-grid" id="avatar-picker">
+        <div class="avatar-card" data-avatar="Richardson" style="--char-color:#FF4500;--char-glow:#FF6B35">
+          <div class="avatar-portrait" id="portrait-Richardson"><div class="avatar-portrait-glow"></div></div>
+          <div class="avatar-info">
+            <div class="avatar-name">Richardson</div>
+            <div class="avatar-title">The Iron Warlord</div>
+            <div class="avatar-element" style="color:#FF4500">Fire</div>
+            <div class="avatar-stats"><span>HP 140</span><span>ATK 22</span><span>SPD 12</span></div>
+          </div>
+          <div class="avatar-selected-badge">SELECTED</div>
+        </div>
+        <div class="avatar-card" data-avatar="Maya" style="--char-color:#9B59B6;--char-glow:#D7BDE2">
+          <div class="avatar-portrait" id="portrait-Maya"><div class="avatar-portrait-glow"></div></div>
+          <div class="avatar-info">
+            <div class="avatar-name">Maya</div>
+            <div class="avatar-title">The Void Sorceress</div>
+            <div class="avatar-element" style="color:#9B59B6">Arcane</div>
+            <div class="avatar-stats"><span>HP 105</span><span>ATK 28</span><span>SPD 18</span></div>
+          </div>
+          <div class="avatar-selected-badge">SELECTED</div>
+        </div>
+        <div class="avatar-card" data-avatar="Zephyr" style="--char-color:#1ABC9C;--char-glow:#76EEC6">
+          <div class="avatar-portrait" id="portrait-Zephyr"><div class="avatar-portrait-glow"></div></div>
+          <div class="avatar-info">
+            <div class="avatar-name">Zephyr</div>
+            <div class="avatar-title">The Shadow Rogue</div>
+            <div class="avatar-element" style="color:#1ABC9C">Wind</div>
+            <div class="avatar-stats"><span>HP 110</span><span>ATK 25</span><span>SPD 25</span></div>
+          </div>
+          <div class="avatar-selected-badge">SELECTED</div>
+        </div>
+        <div class="avatar-card" data-avatar="Nova" style="--char-color:#F39C12;--char-glow:#FFF176">
+          <div class="avatar-portrait" id="portrait-Nova"><div class="avatar-portrait-glow"></div></div>
+          <div class="avatar-info">
+            <div class="avatar-name">Nova</div>
+            <div class="avatar-title">The Celestial Paladin</div>
+            <div class="avatar-element" style="color:#F39C12">Light</div>
+            <div class="avatar-stats"><span>HP 130</span><span>ATK 20</span><span>SPD 14</span></div>
+          </div>
+          <div class="avatar-selected-badge">SELECTED</div>
+        </div>
+        <div class="avatar-card" data-avatar="Atlas" style="--char-color:#E74C3C;--char-glow:#EC7063">
+          <div class="avatar-portrait" id="portrait-Atlas"><div class="avatar-portrait-glow"></div></div>
+          <div class="avatar-info">
+            <div class="avatar-name">Atlas</div>
+            <div class="avatar-title">The Earthborn Titan</div>
+            <div class="avatar-element" style="color:#E74C3C">Earth</div>
+            <div class="avatar-stats"><span>HP 160</span><span>ATK 30</span><span>SPD 8</span></div>
+          </div>
+          <div class="avatar-selected-badge">SELECTED</div>
+        </div>
+      </div>
+      <div class="opponent-section" id="opponent-section">
+        <div class="opp-label">OPPONENT</div>
+        <div class="opponent-chips" id="opponent-picker">
+          <div class="opp-chip" data-opp="Richardson">Richardson</div>
+          <div class="opp-chip" data-opp="Maya">Maya</div>
+          <div class="opp-chip" data-opp="Zephyr">Zephyr</div>
+          <div class="opp-chip" data-opp="Nova">Nova</div>
+          <div class="opp-chip" data-opp="Atlas">Atlas</div>
+        </div>
+      </div>
+      <button class="start-btn" id="start-btn"><span>ENTER THE ARENA</span><div class="start-btn-glow"></div></button>
+    </div>
+  </div>
+
+  <!-- ==================== BATTLE ==================== -->
+  <div id="battle-screen" class="screen">
+    <canvas id="battle-canvas"></canvas>
+
+    <!-- Top bar -->
+    <div class="battle-topbar">
+      <div class="round-info"><span class="round-label">ROUND</span><span class="round-num" id="round-num">1</span></div>
+      <label class="toggle-switch"><input type="checkbox" id="mode-toggle"><span class="toggle-slider"><span class="toggle-label-left">MANUAL</span><span class="toggle-label-right">AUTO</span></span></label>
+      <button class="quit-btn" id="quit-btn">✕ QUIT</button>
+    </div>
+
+    <!-- Stats rows -->
+    <div class="stats-row">
+      <div class="stats-side left">
+        <span class="fighter-name-top" id="p1-name">RICHARDSON</span>
+        <div class="hp-bar-wrap"><div class="bar-label">HP</div><div class="hp-bar-track"><div class="hp-bar-fill" id="hp-bar-p1" style="width:100%"></div></div><div class="hp-text" id="hp-text-p1">140</div></div>
+        <div class="mp-bar-wrap"><div class="bar-label">MP</div><div class="mp-bar-track"><div class="mp-bar-fill" id="mp-bar-p1" style="width:100%"></div></div><div class="mp-text" id="mp-text-p1">70</div></div>
+        <div class="status-icons" id="status-p1"></div>
+      </div>
+      <div style="flex:0 0 auto;text-align:center;padding:0 8px">
+        <div class="score-val" id="score-p1" style="color:var(--gold);font-family:var(--font-title);font-size:20px">0</div>
+        <div style="font-family:var(--font-ui);font-size:8px;color:var(--text-dim);letter-spacing:2px">vs</div>
+        <div class="score-val" id="score-p2" style="color:var(--gold);font-family:var(--font-title);font-size:20px">0</div>
+      </div>
+      <div class="stats-side right">
+        <span class="fighter-name-top" id="p2-name">MAYA</span>
+        <div class="hp-bar-wrap"><div class="bar-label">HP</div><div class="hp-bar-track"><div class="hp-bar-fill p2" id="hp-bar-p2" style="width:100%"></div></div><div class="hp-text" id="hp-text-p2">105</div></div>
+        <div class="mp-bar-wrap"><div class="bar-label">MP</div><div class="mp-bar-track"><div class="mp-bar-fill" id="mp-bar-p2" style="width:100%"></div></div><div class="mp-text" id="mp-text-p2">120</div></div>
+        <div class="status-icons" id="status-p2"></div>
+      </div>
+    </div>
+
+    <!-- Arena -->
+    <div class="arena-center" id="arena-center">
+      <div class="arena-bg"></div>
+      <div class="arena-floor"></div>
+      <div class="arena-lights"></div>
+
+      <!-- P1 fighter -->
+      <div class="fighter-wrap p1" id="wrap-p1">
+        <div class="fighter-sprite idle" id="sprite-p1"><svg id="char-svg-p1" viewBox="0 0 120 200" xmlns="http://www.w3.org/2000/svg"></svg></div>
+        <div class="fighter-shadow-ground"></div>
+        <div class="score-badge"><span class="score-label">WINS</span></div>
+      </div>
+
+      <!-- HUD center -->
+      <div class="battle-hud">
+        <div class="vs-badge">VS</div>
+        <div class="battle-log" id="battle-log"><div class="log-entry intro-entry">The battle begins!</div></div>
+        <div class="turn-indicator" id="turn-indicator">
+          <div class="turn-arrow left-arrow"></div>
+          <span class="turn-text" id="turn-text">Player 1's Turn</span>
+          <div class="turn-arrow right-arrow"></div>
+        </div>
+      </div>
+
+      <!-- P2 fighter -->
+      <div class="fighter-wrap p2" id="wrap-p2">
+        <div class="fighter-sprite idle" id="sprite-p2"><svg id="char-svg-p2" viewBox="0 0 120 200" xmlns="http://www.w3.org/2000/svg"></svg></div>
+        <div class="fighter-shadow-ground"></div>
+        <div class="score-badge"><span class="score-label">WINS</span></div>
+      </div>
+    </div>
+
+    <!-- Moves -->
+    <div class="moves-panel" id="moves-panel">
+      <div class="moves-title">SELECT YOUR MOVE</div>
+      <div class="moves-grid" id="moves-grid"></div>
+    </div>
+
+    <!-- Difficulty -->
+    <div class="difficulty-bar">
+      <span class="diff-label">AI:</span>
+      <button class="diff-btn" data-diff="0">Easy</button>
+      <button class="diff-btn active" data-diff="1">Normal</button>
+      <button class="diff-btn" data-diff="2">Hard</button>
+      <button class="diff-btn" data-diff="3">Brutal</button>
+    </div>
+  </div>
+
+  <!-- ==================== RESULT ==================== -->
+  <div id="result-screen" class="screen">
+    <div class="result-bg"></div>
+    <canvas id="confetti-canvas"></canvas>
+    <div class="result-content">
+      <div class="result-badge" id="result-badge"></div>
+      <div class="result-title" id="result-title">VICTORY!</div>
+      <div class="result-winner-name" id="result-winner-name"></div>
+      <div class="result-winner-svg" id="result-winner-svg"></div>
+      <div class="result-stats" id="result-stats"></div>
+      <div class="result-buttons">
+        <button class="result-btn primary" id="btn-rematch">REMATCH</button>
+        <button class="result-btn secondary" id="btn-menu">MAIN MENU</button>
+      </div>
+    </div>
+    <div class="leaderboard-panel"><div class="lb-title">LEADERBOARD</div><div class="lb-list" id="lb-list"></div></div>
+  </div>
+
+  <!-- FX -->
+  <div id="fx-overlay"><div class="fx-hit" id="fx-hit"></div><div class="fx-text" id="fx-text"></div></div>
+
+  <!-- BLOCK reaction button -->
+  <div id="block-btn-wrap" class="hidden">
+    <div class="block-prompt">INCOMING ATTACK — REACT!</div>
+    <button id="block-btn">🛡️ BLOCK</button>
+    <div class="block-timer-bar"><div id="block-timer-fill" class="block-timer-fill"></div></div>
+  </div>
+</div>
+
+<script>
+window.AVATARS = {"Richardson":{"title":"The Iron Warlord","element":"Fire","hp":140,"mp":70,"attack":22,"defense":15,"speed":12,"color":"#FF4500","glow":"#FF6B35","moves":[{"name":"Iron Strike","cost":0,"damage":[18,26],"type":"physical","fx":"slash"},{"name":"Inferno Blade","cost":25,"damage":[35,50],"type":"fire","fx":"explosion"},{"name":"War Cry","cost":15,"damage":[0,0],"type":"buff","fx":"aura","effect":"atk_up"},{"name":"Molten Shield","cost":20,"damage":[0,0],"type":"defend","fx":"shield","effect":"def_up"}]},"Maya":{"title":"The Void Sorceress","element":"Arcane","hp":105,"mp":120,"attack":28,"defense":8,"speed":18,"color":"#9B59B6","glow":"#D7BDE2","moves":[{"name":"Arcane Bolt","cost":0,"damage":[16,24],"type":"magic","fx":"orb"},{"name":"Void Rift","cost":30,"damage":[45,65],"type":"dark","fx":"rift"},{"name":"Mana Surge","cost":10,"damage":[0,0],"type":"buff","fx":"sparkle","effect":"mp_restore"},{"name":"Gravity Well","cost":35,"damage":[30,40],"type":"dark","fx":"gravity","effect":"slow"}]},"Zephyr":{"title":"The Shadow Rogue","element":"Wind","hp":110,"mp":85,"attack":25,"defense":10,"speed":25,"color":"#1ABC9C","glow":"#76EEC6","moves":[{"name":"Shadow Slash","cost":0,"damage":[14,28],"type":"physical","fx":"dash"},{"name":"Poison Storm","cost":25,"damage":[20,30],"type":"poison","fx":"poison","effect":"poison"},{"name":"Vanish","cost":20,"damage":[0,0],"type":"buff","fx":"smoke","effect":"evade"},{"name":"Death Mark","cost":40,"damage":[55,70],"type":"physical","fx":"blades"}]},"Nova":{"title":"The Celestial Paladin","element":"Light","hp":130,"mp":95,"attack":20,"defense":18,"speed":14,"color":"#F39C12","glow":"#FFF176","moves":[{"name":"Holy Strike","cost":0,"damage":[15,22],"type":"light","fx":"beam"},{"name":"Solar Flare","cost":30,"damage":[40,55],"type":"light","fx":"sunburst"},{"name":"Divine Heal","cost":25,"damage":[0,0],"type":"heal","fx":"heal","effect":"heal"},{"name":"Celestial Aegis","cost":20,"damage":[0,0],"type":"defend","fx":"barrier","effect":"def_up"}]},"Atlas":{"title":"The Earthborn Titan","element":"Earth","hp":160,"mp":60,"attack":30,"defense":20,"speed":8,"color":"#E74C3C","glow":"#EC7063","moves":[{"name":"Titan Smash","cost":0,"damage":[22,32],"type":"physical","fx":"quake"},{"name":"Meteor Drop","cost":35,"damage":[50,75],"type":"earth","fx":"meteor"},{"name":"Stone Skin","cost":15,"damage":[0,0],"type":"defend","fx":"armor","effect":"def_up"},{"name":"Tectonic Rage","cost":40,"damage":[40,60],"type":"earth","fx":"eruption"}]}};
+window.CSRF_TOKEN = "";
+</script>
+<script src="/assets/arena_bundle-47370d62f86c31a6081d725b9113e19ae9963f140adce98c99123e8ddd163bfd.js"></script>
+</body>
+</html>

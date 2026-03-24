@@ -5,7 +5,6 @@
 !/tmp/.keep
 /storage/*
 !/storage/.keep
-/public/assets
 /public/packs
 *.sqlite3
 *.sqlite3-journal
